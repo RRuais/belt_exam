@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>User Sign-In</title>
+</head>
+
+<body>
+    <a href="{% url 'logout' %}">Logout</a>
+    <h1>User Sign-In</h1>
+    <h2>login</h2>
+    <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group" id="login">
+            <label for="email_log">Email:</label>
+            <input type="text" name="email" id="email_log">
+            <label for="pass_log">Password:</label>
+            <input type="password" name="password" id="pass_log">
+            <input type="submit" value="Login" class="form-control btn-primary">
+        </div>
+    </form>
+      <a href="{% url 'register' %}">Don't have an account? Click to register!</a>
+      {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+</body>
+
+</html>
