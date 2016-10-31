@@ -6,9 +6,9 @@ email_regex = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 class UserManager(models.Manager):
     def create_user(self, **kwargs):
         error_list = []
-        if not kwargs['first_name'].isalpha():
+        if not kwargs['first_name'].isalpha() and kwargs['first_name'].isspace():
             error_list.append('First Name is required and must contain only letters')
-        if not kwargs['last_name'].isalpha():
+        if not kwargs['last_name'].isalpha() and kwargs['last_name'].isspace():
             error_list.append('Last Name is required and must contain only letters')
         if not kwargs['email']:
             error_list.append('Email is required')
@@ -50,9 +50,9 @@ class UserManager(models.Manager):
     def update_user(self, **kwargs):
         print ("Update User")
         error_list = []
-        if not kwargs['first_name'].isalpha():
+        if not kwargs['first_name'].isalpha() and kwargs['first_name'].isspace():
             error_list.append('First Name is required and must contain only letters')
-        if not kwargs['last_name'].isalpha():
+        if not kwargs['last_name'].isalpha() and kwargs['last_name'].isspace():
             error_list.append('Last Name is required and must contain only letters')
         if not kwargs['email']:
             error_list.append('Email is required')
@@ -61,7 +61,6 @@ class UserManager(models.Manager):
         if len(error_list) is 0:
             print ("No Errors")
             user = User.objects.filter(id=kwargs['id']).update(first_name=kwargs["first_name"], last_name=kwargs['last_name'], email=kwargs['email'])
-            print user
             return (True, user)
         else:
             return (False, error_list)
@@ -81,27 +80,6 @@ class UserManager(models.Manager):
         else:
             return (False, error_list)
 
-class MessageManager(models.Manager):
-    def create_message(self, **kwargs):
-        error_list = []
-        if not kwargs['message']:
-            error_list.append('Message is required')
-        if len(error_list) is 0:
-            message = Message.objects.create(message=kwargs["message"], user_id=kwargs["user_id"], sender_id=kwargs['sender_id'])
-            return (True, message)
-        else:
-            return (False, error_list)
-
-class CommentManager(models.Manager):
-    def create_comment(self, **kwargs):
-        error_list = []
-        if not kwargs['comment']:
-            error_list.append('Comment is required')
-        if len(error_list) is 0:
-            comment = Comment.objects.create(comment=kwargs["comment"], user_id=kwargs["user_id"], message_id=kwargs['message_id'])
-            return (True, comment)
-        else:
-            return (False, error_list)
 
 class User(models.Model):
     first_name = models.CharField(max_length=200)
@@ -112,18 +90,8 @@ class User(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = UserManager()
 
-class Message(models.Model):
-    message = models.TextField()
-    user_id = models.ForeignKey(User)
-    sender_id = models.IntegerField()
+class Friendships(models.Model):
+    user = models.ForeignKey('User', models.DO_NOTHING, related_name="usersfriend")
+    friend = models.ForeignKey('User', models.DO_NOTHING, related_name ="friendsfriend")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    objects = MessageManager()
-
-class Comment(models.Model):
-    comment = models.TextField()
-    user_id = models.ForeignKey(User)
-    message_id = models.ForeignKey(Message)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = CommentManager()
